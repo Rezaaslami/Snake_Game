@@ -3,38 +3,25 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    const gridSize = 20;
+    const tileSize = canvas.width / gridSize;
+
     let snake = [{ x: 10, y: 10 }];
     let direction = { x: 0, y: 0 };
-    let food = { x: 15, y: 15 };
+    let food = { x: 5, y: 5 };
     let score = 0;
 
+    // کنترل‌های کیبورد
     document.addEventListener('keydown', changeDirection);
-    document.getElementById('up').addEventListener('click', () => changeDir('ArrowUp'));
-    document.getElementById('down').addEventListener('click', () => changeDir('ArrowDown'));
-    document.getElementById('left').addEventListener('click', () => changeDir('ArrowLeft'));
-    document.getElementById('right').addEventListener('click', () => changeDir('ArrowRight'));
 
-    function changeDir(key) {
-      changeDirection({ key: key });
-    }
+    // کنترل‌های دکمه‌ای
+    document.getElementById('up').addEventListener('click', () => changeDirection({ key: 'ArrowUp' }));
+    document.getElementById('down').addEventListener('click', () => changeDirection({ key: 'ArrowDown' }));
+    document.getElementById('left').addEventListener('click', () => changeDirection({ key: 'ArrowLeft' }));
+    document.getElementById('right').addEventListener('click', () => changeDirection({ key: 'ArrowRight' }));
 
-    setInterval(gameLoop, 100);
-
-    function gameLoop() {
-      if (collision()) {
-        alert('Game Over! Your score: ' + score);
-        document.location.reload();
-      }
-      moveSnake();
-      if (eatFood()) {
-        score++;
-        placeFood();
-      }
-      draw();
-    }
-
-    function changeDirection(event) {
-      switch (event.key) {
+    function changeDirection(e) {
+      switch (e.key) {
         case 'ArrowUp':
           if (direction.y === 0) direction = { x: 0, y: -1 };
           break;
@@ -50,42 +37,52 @@
       }
     }
 
-    function moveSnake() {
-      const head = {
-        x: snake[0].x + direction.x,
-        y: snake[0].y + direction.y,
-      };
+    function gameLoop() {
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+      // برخورد
+      if (
+        head.x < 0 || head.x >= gridSize ||
+        head.y < 0 || head.y >= gridSize ||
+        snake.some(seg => seg.x === head.x && seg.y === head.y)
+      ) {
+        alert('Game Over! Your score: ' + score);
+        document.location.reload();
+        return;
+      }
+
       snake.unshift(head);
-      if (!eatFood()) {
+
+      // خوردن غذا
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        placeFood();
+      } else {
         snake.pop();
       }
-    }
 
-    function eatFood() {
-      return snake[0].x === food.x && snake[0].y === food.y;
+      draw();
     }
 
     function placeFood() {
-      food.x = Math.floor(Math.random() * (canvas.width / 10));
-      food.y = Math.floor(Math.random() * (canvas.height / 10));
-    }
-
-    function collision() {
-      const head = snake[0];
-      return (
-        head.x < 0 ||
-        head.x >= canvas.width / 10 ||
-        head.y < 0 ||
-        head.y >= canvas.height / 10 ||
-        snake.slice(1).some((s) => s.x === head.x && s.y === head.y)
-      );
+      food.x = Math.floor(Math.random() * gridSize);
+      food.y = Math.floor(Math.random() * gridSize);
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // مار
       ctx.fillStyle = 'green';
-      snake.forEach((s) => ctx.fillRect(s.x * 10, s.y * 10, 10, 10));
+      snake.forEach(part => {
+        ctx.fillRect(part.x * tileSize, part.y * tileSize, tileSize, tileSize);
+      });
+
+      // غذا
       ctx.fillStyle = 'red';
-      ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+      ctx.fillRect(food.x * tileSize, food.y * tileSize, tileSize, tileSize);
     }
+
+    // شروع بازی
+    setInterval(gameLoop, 150);
   </script>

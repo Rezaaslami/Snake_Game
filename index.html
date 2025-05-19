@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Snake Game</title>
   <style>
     body {
       margin: 0;
+      padding: 0;
+      background-color: #eee;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       font-family: sans-serif;
-      background: #eee;
     }
-    canvas {
-      border: 2px solid #000;
-      background-color: #fff;
+
+    h2 {
       margin-top: 20px;
     }
+
+    canvas {
+      background: #fff;
+      border: 2px solid #000;
+    }
+
     #controls {
       margin-top: 20px;
       display: grid;
@@ -28,20 +33,28 @@
       justify-content: center;
       align-items: center;
     }
+
     .btn {
       width: 60px;
       height: 60px;
       font-size: 24px;
+      background: #333;
+      color: white;
       border: none;
-      background-color: #333;
-      color: #fff;
       border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #score {
+      margin-top: 10px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
   <h2>Snake Game</h2>
   <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <div id="score">Score: 0</div>
 
   <!-- کنترل‌های لمسی -->
   <div id="controls">
@@ -53,5 +66,93 @@
     <button class="btn" id="right">➡️</button>
   </div>
 
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreElement = document.getElementById('score');
+
+    const gridSize = 20;
+    const tileSize = canvas.width / gridSize;
+
+    let snake = [{ x: 10, y: 10 }];
+    let direction = { x: 1, y: 0 }; // شروع به سمت راست
+    let food = { x: 5, y: 5 };
+    let score = 0;
+
+    document.addEventListener('keydown', changeDirection);
+
+    // دکمه‌های لمسی
+    document.getElementById('up').addEventListener('click', () => changeDirection({ key: 'ArrowUp' }));
+    document.getElementById('down').addEventListener('click', () => changeDirection({ key: 'ArrowDown' }));
+    document.getElementById('left').addEventListener('click', () => changeDirection({ key: 'ArrowLeft' }));
+    document.getElementById('right').addEventListener('click', () => changeDirection({ key: 'ArrowRight' }));
+
+    function changeDirection(e) {
+      switch (e.key) {
+        case 'ArrowUp':
+          if (direction.y === 0) direction = { x: 0, y: -1 };
+          break;
+        case 'ArrowDown':
+          if (direction.y === 0) direction = { x: 0, y: 1 };
+          break;
+        case 'ArrowLeft':
+          if (direction.x === 0) direction = { x: -1, y: 0 };
+          break;
+        case 'ArrowRight':
+          if (direction.x === 0) direction = { x: 1, y: 0 };
+          break;
+      }
+    }
+
+    function gameLoop() {
+      draw(); // همیشه صفحه رو بکش
+
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+      // برخورد با دیوار یا خودش
+      if (
+        head.x < 0 || head.x >= gridSize ||
+        head.y < 0 || head.y >= gridSize ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        alert("Game Over! Final Score: " + score);
+        document.location.reload();
+        return;
+      }
+
+      snake.unshift(head);
+
+      // خوردن غذا
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        scoreElement.textContent = "Score: " + score;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+    }
+
+    function placeFood() {
+      food.x = Math.floor(Math.random() * gridSize);
+      food.y = Math.floor(Math.random() * gridSize);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // کشیدن مار
+      ctx.fillStyle = 'green';
+      snake.forEach(part => {
+        ctx.fillRect(part.x * tileSize, part.y * tileSize, tileSize, tileSize);
+      });
+
+      // کشیدن غذا
+      ctx.fillStyle = 'red';
+      ctx.fillRect(food.x * tileSize, food.y * tileSize, tileSize, tileSize);
+    }
+
+    draw(); // نمایش اولیه
+    setInterval(gameLoop, 150); // اجرای بازی
+  </script>
 </body>
 </html>

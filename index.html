@@ -1,13 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+    }
+    canvas {
+      border: 2px solid #000;
+      background-color: #f0f0f0;
+      touch-action: none;
+    }
+    #controls {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      border: none;
+      background-color: #333;
+      color: #fff;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <script src="script.js"></script>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <!-- کنترل‌های لمسی -->
+  <div id="controls">
+    <div></div>
+    <button class="btn" id="up">⬆️</button>
+    <div></div>
+    <button class="btn" id="left">⬅️</button>
+    <button class="btn" id="down">⬇️</button>
+    <button class="btn" id="right">➡️</button>
+  </div>
+
 </body>
 </html>

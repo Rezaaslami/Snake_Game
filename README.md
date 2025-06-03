@@ -1,6 +1,4 @@
 
-..,,,
-
 # Snake Game
 
 This is a simple **Snake Game** built using **HTML, CSS, and JavaScript**.  
